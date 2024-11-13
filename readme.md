@@ -43,3 +43,23 @@ wget https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/m
 # run it
 deno -A main.ts
 ```
+
+## TODO
+
+Some of these points are backwards-incompatible changes, but ultimately strive
+to make the markdown consumable by any text editor, not just logseq.
+
+- Convert `logseq.order-list-type:: number` annotations to numbered lists
+- make tag conversion context-aware to avoid changing hashes in code blocks or
+  logseq queries.
+- Add deadline information to tasks according to the [tasks
+  plugin](https://publish.obsidian.md/tasks/Introduction)
+- Transform document annotation reference ids to the annotated text. 
+- Format [logseq page properties](https://docs.logseq.com/#/page/properties) as
+  frontmatter.
+- Move [logseq block properties](https://docs.logseq.com/#/page/properties) to
+  markdown frontmatter. This builds on the asumption that properties aren't
+  being widely used by myself, but just ocasionally and could very well be page
+  properties, not block properties.
+
+

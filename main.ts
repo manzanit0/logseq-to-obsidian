@@ -1,14 +1,3 @@
-/**
- * Script to migrate a logseq graph to an obsidian vault.
- *
- * 1. Swaps TODO syntax
- * 2. Replaces tags for links everywhere
- * 3. Updates configuration to work with logseq dir strucuture
- *
- * TODO:
- *  - Convert "logseq.order-list-type:: number" to numbered lists
- *  - make tag conversion context-aware to avoid changing hashes in code blocks or logseq queries.
- */
 import { walk } from "jsr:@std/fs";
 
 // logseq supports "TODO/DOING/DONE" syntax for TODOs, however obsidian only
