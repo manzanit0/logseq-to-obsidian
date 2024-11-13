@@ -24,6 +24,11 @@ A script to migrate notes from logseq to obsidian format.
   logseq tags are transformed to obsidian links. This may or may not be up your
   alley.
 
+> [!NOTE]
+> I open sourced this for the sake of sharing something that worked for me and
+> maybe save somebody some time. However, this handles the usecases that were
+> relevant for my notes. Make sure to double check if it does for yours.
+
 ## Run it
 
 Very barebones --
