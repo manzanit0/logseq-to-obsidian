@@ -85,6 +85,32 @@ export function replaceTagsForLinks(text: string) {
   return copy;
 }
 
+export function replaceNumberedLists(text: string) {
+  const lines = text.split("\n");
+  let counter = 0;
+
+  // First filter out the metadata lines and keep track of which lines should be numbered
+  const processedLines = lines
+    .filter((line) => !line.includes("logseq.order-list-type:: number"))
+    .map((line) => {
+      const nextLine = lines[lines.indexOf(line) + 1];
+
+      const isListItem = line.trim().startsWith("-");
+      const isNumbered = nextLine?.includes("logseq.order-list-type:: number");
+
+      if (isListItem && isNumbered) {
+        counter++;
+        return line.replace(/^(\s*)-/, `$1${counter}.`);
+      } else {
+        counter = 0;
+      }
+
+      return line;
+    });
+
+  return processedLines.join("\n");
+}
+
 async function updateConfigForLogseqStructure(filepath: string) {
   const text = await Deno.readTextFile(filepath);
   const config = JSON.parse(text);
@@ -134,12 +160,17 @@ async function run() {
       console.log("updated links for", walkEntry.path);
     }
 
+    const withNumberedLists = replaceNumberedLists(withLinks);
+    if (withLinks !== withNumberedLists) {
+      console.log("updated numbered lists for", walkEntry.path);
+    }
+
     await Deno.writeTextFile(walkEntry.path, withLinks);
   }
 
   await updateConfigForLogseqStructure(".obsidian/app.json");
 }
 
-if(import.meta.main) {
-  run()
+if (import.meta.main) {
+  run();
 }

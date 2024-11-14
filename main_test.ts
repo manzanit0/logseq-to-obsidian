@@ -1,6 +1,10 @@
 import { describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
-import { replaceTagsForLinks, replaceTODOs } from "./main.ts";
+import {
+  replaceNumberedLists,
+  replaceTagsForLinks,
+  replaceTODOs,
+} from "./main.ts";
 
 describe("replaceTODOs", () => {
   it("replaces a single TODO for standard markdown syntax", () => {
@@ -130,5 +134,72 @@ describe("replaceTagsForLinks", () => {
       const result = replaceTagsForLinks(`#foo${x}#bar `);
       expect(result).toBe(`[[foo]]${x}#bar `);
     });
+  });
+});
+
+describe("replaceNumberedLists", () => {
+  it("replaces numbered lists", () => {
+    const input = `
+	- How can we help?
+		- They have three key issues:
+		- How they do [[things]]
+		  logseq.order-list-type:: number
+		- They don't want to have to own their own [[thing]]
+		  logseq.order-list-type:: number
+		- Granting users access is painful and buggy
+		  logseq.order-list-type:: number
+    - Another thing
+`;
+
+    const want = `
+	- How can we help?
+		- They have three key issues:
+		1. How they do [[things]]
+		2. They don't want to have to own their own [[thing]]
+		3. Granting users access is painful and buggy
+    - Another thing
+`;
+    const result = replaceNumberedLists(input);
+    expect(result).toBe(want);
+  });
+
+  it("replaces multiple numbered lists in the same text", () => {
+    const input = `
+	- How can we help?
+		- They have three key issues:
+		- How they do [[things]]
+		  logseq.order-list-type:: number
+		- They don't want to have to own their own [[thing]]
+		  logseq.order-list-type:: number
+		- Granting users access is painful and buggy
+		  logseq.order-list-type:: number
+    - Another thing
+	- How can we help 2?
+		- They have three key issues:
+		- How they do [[things]]
+		  logseq.order-list-type:: number
+		- They don't want to have to own their own [[thing]]
+		  logseq.order-list-type:: number
+		- Granting users access is painful and buggy
+		  logseq.order-list-type:: number
+    - Another thing
+`;
+
+    const want = `
+	- How can we help?
+		- They have three key issues:
+		1. How they do [[things]]
+		2. They don't want to have to own their own [[thing]]
+		3. Granting users access is painful and buggy
+    - Another thing
+	- How can we help 2?
+		- They have three key issues:
+		1. How they do [[things]]
+		2. They don't want to have to own their own [[thing]]
+		3. Granting users access is painful and buggy
+    - Another thing
+`;
+    const result = replaceNumberedLists(input);
+    expect(result).toBe(want);
   });
 });
