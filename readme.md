@@ -15,6 +15,7 @@ A script to migrate notes from logseq to obsidian format.
 - Change logseq TODO format to obsidian TODO format
 - Change the obsidian vault config to so that obsidian integrates with logseq
   directory structure
+- Convert logseq numbered lists to standard markdown numbered lists
 
 ## Caveats
 
@@ -49,7 +50,6 @@ deno -A main.ts
 Some of these points are backwards-incompatible changes, but ultimately strive
 to make the markdown consumable by any text editor, not just logseq.
 
-- Convert `logseq.order-list-type:: number` annotations to numbered lists
 - make tag conversion context-aware to avoid changing hashes in code blocks or
   logseq queries.
 - Add deadline information to tasks according to the [tasks
