@@ -34,17 +34,11 @@ A script to migrate notes from logseq to obsidian format.
 
 ## Run it
 
-Very barebones --
+Very barebones:
 
 ```sh
-# set your logseq graph as your working directory
-cd you/logseq/graph
-
-# Copy the script there
-wget https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/master/main.ts -o main.ts
-
-# run it
-deno -A main.ts
+curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/master/main.ts \
+| deno run --allow-read --allow-write - --in your/logseq/graph --out your/obsidian/vault
 ```
 
 ## TODO
