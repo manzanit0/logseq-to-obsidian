@@ -2,6 +2,7 @@ import { describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
 import {
   replaceNumberedLists,
+  replacePageProperties,
   replaceTagsForLinks,
   replaceTODOs,
 } from "./main.ts";
@@ -203,3 +204,74 @@ describe("replaceNumberedLists", () => {
     expect(result).toBe(want);
   });
 });
+
+describe("replacePageProperties", () => {
+  it("replaces page properties for standard markdown frontmatter", () => {
+    const input = `habit-tracker:: true
+wake-up:: 08:00h
+morning-notes:: not hungry, fasted to keep alert.
+breakfast:: had a late tortilla with coffee at 10.30h
+lunch:: risotto with BBQ leftovers
+dinner:: cabolo nero, tatoes and boiled eggs.
+evening-notes:: left dinner slightly hungry, yet fine. Feeling quite tired at 21h.
+bed-time:: 22.30h
+reading:: 1h
+physical-activity:: none, just sharpened an axe.
+
+- {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
+- [[idea]] might be able to leverage [this repository](https://github.com/lxy1993/mac-network-switch/tree/master) to create a tool to switch from ethernet to wifi on the fly.
+- I’ve been reading a bit of [[Critical Conversations]] and it explained how [[contrasting]] can be used to provide context and proportion when giving [[feedback]]. I think this might be a fantastic way to frame our yearly 360 reviews -> apart from potentially being clearer, it builds that safety.
+`;
+
+    const want = `---
+habit-tracker: true
+wake-up: 08:00h
+morning-notes: not hungry, fasted to keep alert.
+breakfast: had a late tortilla with coffee at 10.30h
+lunch: risotto with BBQ leftovers
+dinner: cabolo nero, tatoes and boiled eggs.
+evening-notes: left dinner slightly hungry, yet fine. Feeling quite tired at 21h.
+bed-time: 22.30h
+reading: 1h
+physical-activity: none, just sharpened an axe.
+---
+
+- {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
+- [[idea]] might be able to leverage [this repository](https://github.com/lxy1993/mac-network-switch/tree/master) to create a tool to switch from ethernet to wifi on the fly.
+- I’ve been reading a bit of [[Critical Conversations]] and it explained how [[contrasting]] can be used to provide context and proportion when giving [[feedback]]. I think this might be a fantastic way to frame our yearly 360 reviews -> apart from potentially being clearer, it builds that safety.
+`;
+
+
+    const result = replacePageProperties(input);
+    expect(result).toBe(want);
+  });
+
+  it("trims empty leading lines", () => {
+    const input = `
+
+
+habit-tracker:: true
+wake-up:: 08:00h
+
+- {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
+- [[idea]] might be able to leverage [this repository](https://github.com/lxy1993/mac-network-switch/tree/master) to create a tool to switch from ethernet to wifi on the fly.
+- I’ve been reading a bit of [[Critical Conversations]] and it explained how [[contrasting]] can be used to provide context and proportion when giving [[feedback]]. I think this might be a fantastic way to frame our yearly 360 reviews -> apart from potentially being clearer, it builds that safety.
+`;
+
+    const want = `---
+habit-tracker: true
+wake-up: 08:00h
+---
+
+- {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
+- [[idea]] might be able to leverage [this repository](https://github.com/lxy1993/mac-network-switch/tree/master) to create a tool to switch from ethernet to wifi on the fly.
+- I’ve been reading a bit of [[Critical Conversations]] and it explained how [[contrasting]] can be used to provide context and proportion when giving [[feedback]]. I think this might be a fantastic way to frame our yearly 360 reviews -> apart from potentially being clearer, it builds that safety.
+`;
+
+
+    const result = replacePageProperties(input);
+    expect(result).toBe(want);
+  });
+})
+
+

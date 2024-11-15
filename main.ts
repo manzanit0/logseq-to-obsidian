@@ -113,6 +113,42 @@ export function replaceNumberedLists(text: string) {
   return processedLines.join("\n");
 }
 
+export function replacePageProperties(text: string) {
+  const lines = text.split("\n");
+  const properties: string[] = [];
+  const content: string[] = [];
+  let processingProperties = true;
+
+  for (const line of lines) {
+    if (processingProperties) {
+      // Skip empty lines at the start
+      if (line.trim() === "") {
+        continue;
+      }
+      
+      // If we hit a non-property line, we're done with properties
+      if (!line.includes("::")) {
+        processingProperties = false;
+        content.push(line);
+        continue;
+      }
+
+      // Convert property to YAML format
+      const [key, value] = line.split("::");
+      properties.push(`${key.trim()}: ${value.trim()}`);
+    } else {
+      content.push(line);
+    }
+  }
+
+  // Only add frontmatter if we found properties
+  if (properties.length > 0) {
+    return `---\n${properties.join("\n")}\n---\n\n${content.join("\n")}`;
+  }
+
+  return text;
+}
+
 async function updateConfigForLogseqStructure(filepath: string) {
   const text = await Deno.readTextFile(filepath);
   const config = JSON.parse(text);
@@ -165,6 +201,11 @@ async function run() {
     const withNumberedLists = replaceNumberedLists(withLinks);
     if (withLinks !== withNumberedLists) {
       console.log("updated numbered lists for", walkEntry.path);
+    }
+
+    const withPageProperties = replacePageProperties(withNumberedLists);
+    if (withPageProperties !== withNumberedLists) {
+      console.log("updated page properties for", walkEntry.path);
     }
 
     await Deno.writeTextFile(walkEntry.path, withLinks);
