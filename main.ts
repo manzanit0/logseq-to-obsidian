@@ -236,7 +236,7 @@ async function run() {
       console.log("updated page properties for", walkEntry.path);
     }
 
-    await Deno.writeTextFile(walkEntry.path, withLinks);
+    await Deno.writeTextFile(walkEntry.path, withPageProperties);
   }
 
   if (existsSync(".obsidian/app.json")) {
