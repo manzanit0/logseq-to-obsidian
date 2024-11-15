@@ -89,14 +89,16 @@ export function replaceNumberedLists(text: string) {
   const lines = text.split("\n");
   let counter = 0;
 
+  const logseqNumberingAnnotation = "logseq.order-list-type:: number";
+
   // First filter out the metadata lines and keep track of which lines should be numbered
   const processedLines = lines
-    .filter((line) => !line.includes("logseq.order-list-type:: number"))
+    .filter((line) => !line.includes(logseqNumberingAnnotation))
     .map((line) => {
       const nextLine = lines[lines.indexOf(line) + 1];
 
       const isListItem = line.trim().startsWith("-");
-      const isNumbered = nextLine?.includes("logseq.order-list-type:: number");
+      const isNumbered = nextLine?.includes(logseqNumberingAnnotation);
 
       if (isListItem && isNumbered) {
         counter++;
