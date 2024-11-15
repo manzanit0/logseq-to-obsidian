@@ -272,6 +272,29 @@ wake-up: 08:00h
     const result = replacePageProperties(input);
     expect(result).toBe(want);
   });
+
+  it("transforms logseq links to plain text", () => {
+    const input = `
+a-list:: [[something]], [[other]]
+b-list:: [[just-one]]
+c-list:: correct
+
+- {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
+`;
+
+    const want = `---
+a-list: something, other
+b-list: just-one
+c-list: correct
+---
+
+- {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
+`;
+
+
+    const result = replacePageProperties(input);
+    expect(result).toBe(want);
+  });
 })
 
 

@@ -136,7 +136,9 @@ export function replacePageProperties(text: string) {
 
       // Convert property to YAML format
       const [key, value] = line.split("::");
-      properties.push(`${key.trim()}: ${value.trim()}`);
+      // Convert [[links]] to plain text by removing brackets
+      const cleanValue = value.trim().replace(/\[\[(.*?)\]\]/g, "$1");
+      properties.push(`${key.trim()}: ${cleanValue}`);
     } else {
       content.push(line);
     }
