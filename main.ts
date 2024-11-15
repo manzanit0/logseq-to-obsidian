@@ -176,6 +176,20 @@ async function updateConfigForLogseqStructure(filepath: string) {
   }
 }
 
+export function organizeFileWithSlashEncoding(filepath: string) {
+  if (!filepath.includes("%2F")) {
+    return { newPath: filepath, shouldMove: false };
+  }
+
+  const newPath = filepath.replaceAll("%2F", "/");
+  const targetDir = newPath.split("/").slice(0, -1).join("/");
+  return {
+    newPath,
+    targetDir,
+    shouldMove: true,
+  };
+}
+
 async function run() {
   const flags = parseArgs(Deno.args, {
     string: ["in", "out"],
@@ -216,6 +230,21 @@ async function run() {
     // We only care about the markdown bits right now.
     if (type !== "file" || !walkEntry.path.includes(".md")) {
       continue;
+    }
+
+    const {
+      newPath,
+      shouldMove,
+      targetDir,
+    } = organizeFileWithSlashEncoding(walkEntry.path);
+
+    if (shouldMove) {
+      await Deno.mkdir(targetDir!, { recursive: true });
+
+      await Deno.rename(walkEntry.path, newPath);
+      console.log(`moved ${walkEntry.path} to ${newPath}`);
+
+      walkEntry.path = newPath;
     }
 
     const original = await Deno.readTextFile(walkEntry.path);

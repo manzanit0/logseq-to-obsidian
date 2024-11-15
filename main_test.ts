@@ -1,6 +1,7 @@
 import { describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
 import {
+organizeFileWithSlashEncoding,
   replaceNumberedLists,
   replacePageProperties,
   replaceTagsForLinks,
@@ -202,6 +203,34 @@ describe("replaceNumberedLists", () => {
 `;
     const result = replaceNumberedLists(input);
     expect(result).toBe(want);
+  });
+});
+
+describe("organizeFileWithSlashEncoding", () => {
+  it("reorganizes a file path with %2F encoding", () => {
+    const result = organizeFileWithSlashEncoding("docker%2Fgitops.md");
+    expect(result).toEqual({
+      newPath: "docker/gitops.md",
+      targetDir: "docker",
+      shouldMove: true
+    });
+  });
+
+  it("handles multiple %2F encodings", () => {
+    const result = organizeFileWithSlashEncoding("infrastructure%2Fkubernetes%2Fhelm.md");
+    expect(result).toEqual({
+      newPath: "infrastructure/kubernetes/helm.md",
+      targetDir: "infrastructure/kubernetes",
+      shouldMove: true
+    });
+  });
+
+  it("leaves normal paths unchanged", () => {
+    const result = organizeFileWithSlashEncoding("normal-file.md");
+    expect(result).toEqual({
+      newPath: "normal-file.md",
+      shouldMove: false
+    });
   });
 });
 
