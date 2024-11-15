@@ -2,12 +2,14 @@
 
 A script to migrate notes from logseq to obsidian format.
 
-## Assumptions
+## Run it
 
-1. You're don't care about the directory structure of your notes too much. You
-   just want things "to work".
-2. You would like to be able to use both apps on the same notes from time to
-   time.
+Very barebones:
+
+```sh
+curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/master/main.ts \
+| deno run --allow-read --allow-write - --in your/logseq/graph --out your/obsidian/vault
+```
 
 ## What it does
 
@@ -18,6 +20,7 @@ A script to migrate notes from logseq to obsidian format.
 - Convert logseq numbered lists to standard markdown numbered lists
 - Format [logseq page properties](https://docs.logseq.com/#/page/properties) as
   frontmatter.
+- Nests nested logseq pages in actual directories.
 
 ## Caveats
 
@@ -31,15 +34,6 @@ A script to migrate notes from logseq to obsidian format.
 > I open sourced this for the sake of sharing something that worked for me and
 > maybe save somebody some time. However, this handles the usecases that were
 > relevant for my notes. Make sure to double check if it does for yours.
-
-## Run it
-
-Very barebones:
-
-```sh
-curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/master/main.ts \
-| deno run --allow-read --allow-write - --in your/logseq/graph --out your/obsidian/vault
-```
 
 ## TODO
 
