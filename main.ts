@@ -204,6 +204,8 @@ async function run() {
   await copy(input, output, { preserveTimestamps: true });
   console.log(`copied logseq graph to ${output}`);
 
+  await Deno.remove(`${output}/logseq`, { recursive: true });
+
   for await (const walkEntry of walk(output)) {
     const type = walkEntry.isSymlink
       ? "symlink"
