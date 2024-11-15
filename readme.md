@@ -16,6 +16,8 @@ A script to migrate notes from logseq to obsidian format.
 - Change the obsidian vault config to so that obsidian integrates with logseq
   directory structure
 - Convert logseq numbered lists to standard markdown numbered lists
+- Format [logseq page properties](https://docs.logseq.com/#/page/properties) as
+  frontmatter.
 
 ## Caveats
 
@@ -55,8 +57,6 @@ to make the markdown consumable by any text editor, not just logseq.
 - Add deadline information to tasks according to the [tasks
   plugin](https://publish.obsidian.md/tasks/Introduction)
 - Transform document annotation reference ids to the annotated text. 
-- Format [logseq page properties](https://docs.logseq.com/#/page/properties) as
-  frontmatter.
 - Move [logseq block properties](https://docs.logseq.com/#/page/properties) to
   markdown frontmatter. This builds on the asumption that properties aren't
   being widely used by myself, but just ocasionally and could very well be page
