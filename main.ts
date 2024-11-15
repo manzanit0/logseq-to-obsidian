@@ -1,4 +1,5 @@
-import { walk } from "jsr:@std/fs";
+import { copy, existsSync, walk } from "jsr:@std/fs";
+import { parseArgs } from "jsr:@std/cli/parse-args";
 
 // logseq supports "TODO/DOING/DONE" syntax for TODOs, however obsidian only
 // supports conventional markdown "[ ]".
@@ -125,7 +126,7 @@ export function replacePageProperties(text: string) {
       if (line.trim() === "") {
         continue;
       }
-      
+
       // If we hit a non-property line, we're done with properties
       if (!line.includes("::")) {
         processingProperties = false;
@@ -174,7 +175,34 @@ async function updateConfigForLogseqStructure(filepath: string) {
 }
 
 async function run() {
-  for await (const walkEntry of walk(Deno.cwd())) {
+  const flags = parseArgs(Deno.args, {
+    string: ["in", "out"],
+    default: { in: "." },
+  });
+
+  const input = flags.in;
+  const output = flags.out;
+  if (!output) {
+    throw "provide --out for now";
+  }
+
+  // validate that input EXISTS
+  if (!existsSync(input)) {
+    console.log(`${input} doesn't exist. Provide a valid input path.`);
+    Deno.exit(1);
+  }
+
+  if (existsSync(output)) {
+    console.log(
+      `${output} already exists. Provide a different path to copy the logseq graph.`,
+    );
+    Deno.exit(1);
+  }
+
+  await copy(input, output, { preserveTimestamps: true });
+  console.log(`copied logseq graph to ${output}`);
+
+  for await (const walkEntry of walk(output)) {
     const type = walkEntry.isSymlink
       ? "symlink"
       : walkEntry.isFile
@@ -211,7 +239,9 @@ async function run() {
     await Deno.writeTextFile(walkEntry.path, withLinks);
   }
 
-  await updateConfigForLogseqStructure(".obsidian/app.json");
+  if (existsSync(".obsidian/app.json")) {
+    await updateConfigForLogseqStructure(".obsidian/app.json");
+  }
 }
 
 if (import.meta.main) {
