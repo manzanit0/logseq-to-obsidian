@@ -25,6 +25,7 @@ curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/m
 - Format [logseq page properties](https://docs.logseq.com/#/page/properties) as
   frontmatter.
 - Nests nested logseq pages in actual directories.
+- remove logseq `collapsed:: true` properties.
 
 ## Caveats
 
