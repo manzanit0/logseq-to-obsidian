@@ -159,6 +159,28 @@ export function removeCollapsedBlocks(text: string) {
     .join("\n");
 }
 
+export function removeLogbooks(text: string) {
+  const lines = text.split("\n");
+  const result: string[] = [];
+  let inLogbook = false;
+
+  for (const line of lines) {
+    if (line.trim() === ":LOGBOOK:") {
+      inLogbook = true;
+      continue;
+    }
+    if (line.trim() === ":END:" && inLogbook) {
+      inLogbook = false;
+      continue;
+    }
+    if (!inLogbook) {
+      result.push(line);
+    }
+  }
+
+  return result.join("\n");
+}
+
 async function updateConfigForLogseqStructure(filepath: string) {
   const text = await Deno.readTextFile(filepath);
   const config = JSON.parse(text);
@@ -314,7 +336,12 @@ async function run() {
       console.log("removed collapsed blocks for", walkEntry.path);
     }
 
-    await Deno.writeTextFile(walkEntry.path, withoutCollapsedBlocks);
+    const withoutLogbooks = removeLogbooks(withoutCollapsedBlocks);
+    if (withoutCollapsedBlocks !== withoutLogbooks) {
+      console.log("removed logbooks for", walkEntry.path);
+    }
+
+    await Deno.writeTextFile(walkEntry.path, withoutLogbooks);
   }
 
   if (existsSync(".obsidian/app.json")) {

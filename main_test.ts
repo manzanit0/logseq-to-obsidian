@@ -8,6 +8,7 @@ import {
   replaceTagsForLinks,
   replaceTODOs,
   updateRelativePaths,
+  removeLogbooks,
 } from "./main.ts";
 
 describe("replaceTODOs", () => {
@@ -345,6 +346,57 @@ describe("removeCollapsedBlocks", () => {
   - another line
   -last line`
     expect(removeCollapsedBlocks(input)).toBe(want);
+  });
+});
+
+describe("removeLogbooks", () => {
+  it("does nothing if there are no logbooks", () => {
+    const input = `- TODO foo bar`;
+    expect(removeLogbooks(input)).toBe(input);
+  });
+
+  it("removes a simple logbook", () => {
+    const input = `- Some content
+:LOGBOOK:
+* State "DONE" from "TODO" [2023-11-16 Thu 10:00]
+:END:
+- More content`;
+
+    const want = `- Some content
+- More content`;
+    expect(removeLogbooks(input)).toBe(want);
+  });
+
+  it("removes multiple logbooks", () => {
+    const input = `- First section
+:LOGBOOK:
+* Log entry 1
+:END:
+- Middle section
+:LOGBOOK:
+* Log entry 2
+:END:
+- Last section`;
+
+    const want = `- First section
+- Middle section
+- Last section`;
+    expect(removeLogbooks(input)).toBe(want);
+  });
+
+  it("handles nested content correctly", () => {
+    const input = `- Top level
+  :LOGBOOK:
+  * Nested log
+  * Another log
+  :END:
+  - Still nested
+- Back to top`;
+
+    const want = `- Top level
+  - Still nested
+- Back to top`;
+    expect(removeLogbooks(input)).toBe(want);
   });
 });
 
