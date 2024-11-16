@@ -1,7 +1,8 @@
 import { describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
 import {
-organizeFileWithSlashEncoding,
+  organizeFileWithSlashEncoding,
+  removeCollapsedBlocks,
   replaceNumberedLists,
   replacePageProperties,
   replaceTagsForLinks,
@@ -212,16 +213,18 @@ describe("organizeFileWithSlashEncoding", () => {
     expect(result).toEqual({
       newPath: "docker/gitops.md",
       targetDir: "docker",
-      shouldMove: true
+      shouldMove: true,
     });
   });
 
   it("handles multiple %2F encodings", () => {
-    const result = organizeFileWithSlashEncoding("infrastructure%2Fkubernetes%2Fhelm.md");
+    const result = organizeFileWithSlashEncoding(
+      "infrastructure%2Fkubernetes%2Fhelm.md",
+    );
     expect(result).toEqual({
       newPath: "infrastructure/kubernetes/helm.md",
       targetDir: "infrastructure/kubernetes",
-      shouldMove: true
+      shouldMove: true,
     });
   });
 
@@ -229,7 +232,7 @@ describe("organizeFileWithSlashEncoding", () => {
     const result = organizeFileWithSlashEncoding("normal-file.md");
     expect(result).toEqual({
       newPath: "normal-file.md",
-      shouldMove: false
+      shouldMove: false,
     });
   });
 });
@@ -270,7 +273,6 @@ physical-activity: none, just sharpened an axe.
 - I’ve been reading a bit of [[Critical Conversations]] and it explained how [[contrasting]] can be used to provide context and proportion when giving [[feedback]]. I think this might be a fantastic way to frame our yearly 360 reviews -> apart from potentially being clearer, it builds that safety.
 `;
 
-
     const result = replacePageProperties(input);
     expect(result).toBe(want);
   });
@@ -297,7 +299,6 @@ wake-up: 08:00h
 - I’ve been reading a bit of [[Critical Conversations]] and it explained how [[contrasting]] can be used to provide context and proportion when giving [[feedback]]. I think this might be a fantastic way to frame our yearly 360 reviews -> apart from potentially being clearer, it builds that safety.
 `;
 
-
     const result = replacePageProperties(input);
     expect(result).toBe(want);
   });
@@ -320,10 +321,28 @@ c-list: correct
 - {{embed ((64156f89-61ed-4d06-a326-f01ff0b93759))}}
 `;
 
-
     const result = replacePageProperties(input);
     expect(result).toBe(want);
   });
-})
+});
 
+describe("removeCollapsedBlocks", () => {
+  it("does nothing if there are no collapsed blocks", () => {
+    const input = `- TODO foo bar`
+    expect(removeCollapsedBlocks(input)).toBe(input);
+  });
 
+  it("does nothing if there are no collapsed blocks", () => {
+    const input = `
+- TODO foo bar
+  - another line
+  collapsed:: true
+  -last line`
+
+    const want = `
+- TODO foo bar
+  - another line
+  -last line`
+    expect(removeCollapsedBlocks(input)).toBe(want);
+  });
+});

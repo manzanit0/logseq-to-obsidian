@@ -152,6 +152,13 @@ export function replacePageProperties(text: string) {
   return text;
 }
 
+export function removeCollapsedBlocks(text: string) {
+  return text
+    .split("\n")
+    .filter((x) => !x.includes("collapsed:: true"))
+    .join("\n");
+}
+
 async function updateConfigForLogseqStructure(filepath: string) {
   const text = await Deno.readTextFile(filepath);
   const config = JSON.parse(text);
@@ -274,7 +281,12 @@ async function run() {
       console.log("updated page properties for", walkEntry.path);
     }
 
-    await Deno.writeTextFile(walkEntry.path, withPageProperties);
+    const withoutCollapsedBlocks = removeCollapsedBlocks(withPageProperties);
+    if (withPageProperties !== withoutCollapsedBlocks) {
+      console.log("removed collapsed blocks for", walkEntry.path);
+    }
+
+    await Deno.writeTextFile(walkEntry.path, withoutCollapsedBlocks);
   }
 
   if (existsSync(".obsidian/app.json")) {
