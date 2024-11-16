@@ -7,6 +7,7 @@ import {
   replacePageProperties,
   replaceTagsForLinks,
   replaceTODOs,
+  updateRelativePaths,
 } from "./main.ts";
 
 describe("replaceTODOs", () => {
@@ -344,5 +345,39 @@ describe("removeCollapsedBlocks", () => {
   - another line
   -last line`
     expect(removeCollapsedBlocks(input)).toBe(want);
+  });
+});
+
+describe("updateRelativePaths", () => {
+  it("adds extra ../ when file moves deeper", () => {
+    const originalPath = "/usr/foo/bar"
+    const newPath = "/usr/foo/bar/new"
+    const input = `Check this ![image](../assets/foo.png) and [link](../docs/bar.md)`;
+    const result = updateRelativePaths(input, originalPath, newPath);
+    expect(result).toBe(`Check this ![image](../../assets/foo.png) and [link](../../docs/bar.md)`);
+  });
+
+  it("leaves paths unchanged when depth is same", () => {
+    const originalPath = "/usr/foo/bar"
+    const newPath = "/usr/foo/bar"
+    const input = `Check this ![image](../assets/foo.png)`;
+    const result = updateRelativePaths(input, originalPath, newPath);
+    expect(result).toBe(input);
+  });
+
+  it("handles multiple references on same line", () => {
+    const originalPath = "/usr/foo/bar"
+    const newPath = "/usr/foo/bar/new"
+    const input = `![img1](../a.png) and ![img2](../b.png)`;
+    const result = updateRelativePaths(input, originalPath, newPath);
+    expect(result).toBe(`![img1](../../a.png) and ![img2](../../b.png)`);
+  });
+
+  it("only updates relative paths", () => {
+    const originalPath = "/usr/foo/bar"
+    const newPath = "/usr/foo/bar/new"
+    const input = `![abs](/assets/foo.png) and ![rel](../bar.png)`;
+    const result = updateRelativePaths(input, originalPath, newPath);
+    expect(result).toBe(`![abs](/assets/foo.png) and ![rel](../../bar.png)`);
   });
 });

@@ -24,7 +24,7 @@ curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/m
 - Convert logseq numbered lists to standard markdown numbered lists
 - Format [logseq page properties](https://docs.logseq.com/#/page/properties) as
   frontmatter.
-- Nests nested logseq pages in actual directories.
+- Nests nested logseq pages in actual directories and updates all relative path references.
 - remove logseq `collapsed:: true` properties.
 
 ## Caveats
@@ -54,5 +54,5 @@ to make the markdown consumable by any text editor, not just logseq.
   markdown frontmatter. This builds on the asumption that properties aren't
   being widely used by myself, but just ocasionally and could very well be page
   properties, not block properties.
-
+- remove `:LOGBOOK:` blocks
 

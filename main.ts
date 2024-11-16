@@ -183,6 +183,24 @@ async function updateConfigForLogseqStructure(filepath: string) {
   }
 }
 
+export function updateRelativePaths(
+  content: string,
+  originalPath: string,
+  newPath: string,
+): string {
+  // Calculate directory depths for path adjustment
+  const oldDepth = originalPath.split("/").length - 1;
+  const newDepth = newPath.split("/").length - 1;
+
+  if (oldDepth === newDepth) return content;
+
+  const depthDiff = newDepth - oldDepth;
+  return content.replace(/(?:\.\.?\/(?:[\w\-.]+\/?)*[\w\-.]*)/g, (match) => {
+    const prefix = "../".repeat(depthDiff);
+    return `${prefix}${match}`;
+  });
+}
+
 export function organizeFileWithSlashEncoding(filepath: string) {
   if (!filepath.includes("%2F")) {
     return { newPath: filepath, shouldMove: false };
@@ -244,6 +262,9 @@ async function run() {
       continue;
     }
 
+    const original = await Deno.readTextFile(walkEntry.path);
+    let withUpdatedRelativePaths = original
+
     const {
       newPath,
       shouldMove,
@@ -256,12 +277,19 @@ async function run() {
       await Deno.rename(walkEntry.path, newPath);
       console.log(`moved ${walkEntry.path} to ${newPath}`);
 
+      withUpdatedRelativePaths = updateRelativePaths(
+        original,
+        walkEntry.path,
+        newPath,
+      );
+      if (withUpdatedRelativePaths !== original) {
+        console.log(`updated relative paths in ${newPath}`);
+      }
+
       walkEntry.path = newPath;
     }
 
-    const original = await Deno.readTextFile(walkEntry.path);
-
-    const withTODOs = replaceTODOs(original);
+    const withTODOs = replaceTODOs(withUpdatedRelativePaths);
     if (withTODOs !== original) {
       console.log("updated TODOs for", walkEntry.path);
     }
