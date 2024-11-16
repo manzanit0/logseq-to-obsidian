@@ -43,9 +43,6 @@ curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/m
 
 ## TODO
 
-Some of these points are backwards-incompatible changes, but ultimately strive
-to make the markdown consumable by any text editor, not just logseq.
-
 - make tag conversion context-aware to avoid changing hashes in code blocks or
   logseq queries.
 - Add deadline information to tasks according to the [tasks
