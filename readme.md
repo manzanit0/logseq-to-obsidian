@@ -11,6 +11,10 @@ curl https://raw.githubusercontent.com/manzanit0/logseq-to-obsidian/refs/heads/m
 | deno run --allow-read --allow-write - --in your/logseq/graph --out your/obsidian/vault
 ```
 
+### Options
+
+- `--force`: deletes the output directory before writing, if it exists.
+
 ## What it does
 
 - Change logseq tags to be obsidian links.

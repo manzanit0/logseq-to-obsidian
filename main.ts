@@ -193,7 +193,8 @@ export function organizeFileWithSlashEncoding(filepath: string) {
 async function run() {
   const flags = parseArgs(Deno.args, {
     string: ["in", "out"],
-    default: { in: "." },
+    boolean: ["force"],
+    default: { in: ".", force: false },
   });
 
   const input = flags.in;
@@ -209,10 +210,14 @@ async function run() {
   }
 
   if (existsSync(output)) {
-    console.log(
-      `${output} already exists. Provide a different path to copy the logseq graph.`,
-    );
-    Deno.exit(1);
+    if (flags.force) {
+      await Deno.remove(output, { recursive: true });
+    } else {
+      console.log(
+        `${output} already exists. Provide a different path to copy the logseq graph.`,
+      );
+      Deno.exit(1);
+    }
   }
 
   await copy(input, output, { preserveTimestamps: true });
