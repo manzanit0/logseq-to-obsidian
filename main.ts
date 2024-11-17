@@ -285,7 +285,7 @@ async function run() {
     }
 
     const original = await Deno.readTextFile(walkEntry.path);
-    let withUpdatedRelativePaths = original
+    let withUpdatedRelativePaths = original;
 
     const {
       newPath,
@@ -344,9 +344,12 @@ async function run() {
     await Deno.writeTextFile(walkEntry.path, withoutLogbooks);
   }
 
-  if (existsSync(".obsidian/app.json")) {
-    await updateConfigForLogseqStructure(".obsidian/app.json");
+  if (!existsSync(".obsidian/app.json")) {
+    Deno.createSync(".obsidian/app.json");
+    Deno.writeTextFileSync(".obsidian/app.json", "{}");
   }
+
+  await updateConfigForLogseqStructure(".obsidian/app.json");
 }
 
 if (import.meta.main) {
